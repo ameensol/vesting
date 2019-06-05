@@ -1,4 +1,4 @@
-const { BN, shouldFail, time } = require('openzeppelin-test-helpers')
+const { BN, expectRevert, time } = require('openzeppelin-test-helpers')
 const assert = require("assert")
 
 const TokenVesting = artifacts.require("TokenVesting")
@@ -19,7 +19,7 @@ contract("TokenVesting", function([_, owner, beneficiary]) {
 
     assert(cliffDuration >= duration)
 
-    await shouldFail.reverting.withMessage(
+    await expectRevert(
       TokenVesting.new(beneficiary, this.start, cliffDuration, duration, true, { from: owner }),
       'TokenVesting: cliff is longer than duration'
     )
