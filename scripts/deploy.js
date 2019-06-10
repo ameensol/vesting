@@ -1,8 +1,7 @@
 async function main() {
-  const Greeter = artifacts.require("Greeter");
-
-  const greeter = await Greeter.new("Hello, Buidler!");
-  console.log("Greeter deployed to:", greeter.address);
+  const TokenVesting = artifacts.require("TokenVesting")
+  const tokenvesting = await TokenVesting.new()
+  console.log(`TokenVesting is live at: ${tokenvesting.address}`)
 }
 
 main()
