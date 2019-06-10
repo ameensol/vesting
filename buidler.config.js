@@ -8,10 +8,9 @@ usePlugin('@nomiclabs/buidler-truffle5')
 task('orchestrate', 'Orchestrates deployment of vesting contracts')
   .addParam('file', 'Path to csv file containing deployment data')
   .setAction(async (taskArgs) => {
-
+    const { file } = taskArgs
     const SPANKCHAIN_MULTISIG = ''
 
-    const { file } = taskArgs
     const raw = fs.readFileSync(file)
     const parsed = parse(raw, { columns: true, skip_empty_lines: true }).map((row) => {
       return Object.keys(row).reduce((transformed, header) => {
@@ -20,19 +19,23 @@ task('orchestrate', 'Orchestrates deployment of vesting contracts')
       }, {})
     })
 
-    const deployed = await Promise.all(parsed.map(async (row) => {
-      const vestingContract = await run('deployVesting', {
+    // Use a simple for loop instead of functional method to force synchronous execution; Buidler handles running transactions in parallel quite poorly.
+    for (let i = 0; i < parsed.length; i++) {
+      const row = parsed[i]
+
+      console.log(`Deploying vesting contract for ${row.name}`)
+      const contract = await run('deployVesting', {
         beneficiary: row.address,
         start: Math.floor(new Date(row.startDate).getTime()),
         cliff_duration: row.cliff.replace(/,/g, ''),
         duration: row.duration.replace(/,/g, ''),
       })
-      await run('setOwner', { vestingAddress: vestingContract.address, newOwner: SPANKCHAIN_MULTISIG })
+      console.log(`Vesting contract for ${row.name} deployed to ${contract.address}. Vesting address: ${row.address}`)
+      await run('setOwner', { vestingAddress: contract.address, newOwner: SPANKCHAIN_MULTISIG })
+      console.log(`Vesting contract ${contract.address} owner set to ${SPANKCHAIN_MULTISIG}`)
+    }
 
-      return `Name: ${row.name}, Wallet Address: ${row.address}, Vesting Address: ${vestingContract.address}`
-    }))
-
-    console.log(deployed)
+    console.log('Finito')
   })
 
 task('deployToken', 'Deploys a token contract')
