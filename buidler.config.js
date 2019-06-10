@@ -10,7 +10,7 @@ usePlugin('@nomiclabs/buidler-truffle5')
 task('orchestrate', 'Herps the derp then smokes some purp')
   .addParam('file', 'Path to csv file containing deployment data')
   .setAction(async (taskArgs) => {
-    const SPANKCHAIN_MULTISIG = '0x0f34d600a0022217A8c625D0926f265C5617A6d9'
+    const SPANKCHAIN_MULTISIG = ''
 
     const { file } = taskArgs
     const raw = fs.readFileSync(file)
