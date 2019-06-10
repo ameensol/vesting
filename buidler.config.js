@@ -1,5 +1,3 @@
-const cp = require('child_process')
-const csv = require('csv')
 const fs = require('fs')
 const parse = require('csv-parse/lib/sync')
 'use strict'
@@ -7,9 +5,10 @@ const parse = require('csv-parse/lib/sync')
 usePlugin('@nomiclabs/buidler-truffle5')
 
 // file -> string
-task('orchestrate', 'Herps the derp then smokes some purp')
+task('orchestrate', 'Orchestrates deployment of vesting contracts')
   .addParam('file', 'Path to csv file containing deployment data')
   .setAction(async (taskArgs) => {
+
     const SPANKCHAIN_MULTISIG = ''
 
     const { file } = taskArgs
@@ -61,7 +60,6 @@ task('deployVesting', 'Deploys a vesting contract based on provided params')
 
     const TokenVesting = artifacts.require("TokenVesting")
     const accounts = await ethereum.send('eth_accounts')
-
     return await TokenVesting.new(beneficiary, start, cliff_duration, duration, true, { from: accounts[0] })
   })
 
@@ -95,8 +93,20 @@ task('accounts', 'Prints a list of the available accounts', async () => {
   console.log('Accounts:', accounts)
 })
 
-module.exports = {}
-
+module.exports = {
+  networks: {
+    mainnet: {
+      url: '', // Node URI
+      from: '', // Transaction-issuing address
+      accounts: [], // Array of 0x-prefixed private keys
+    },
+    ropsten: {
+      url: '', // Node URI
+      from: '', // Transaction-issuing address
+      accounts: [], // Array of 0x-prefixed private keys
+    }
+  }
+}
 
 // Helpers
 function toCamelCase(str) {
